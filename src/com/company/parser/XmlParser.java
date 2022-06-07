@@ -15,18 +15,18 @@ public class XmlParser {
 
         if(object instanceof Collection) {
             var collection = (Collection) object;
+            var fieldName =  objectClass.isAnnotationPresent(TagName.class)
+                    ? objectClass.getAnnotation(TagName.class).value()
+                    : objectClass.getSimpleName();
 
-            xmlBuilder.append("<lista>");
+            xmlBuilder.append("<" + fieldName + ">");
             for (Object o: collection){
                 String xml = toXml(o);
                 xmlBuilder.append(xml);
             }
-            xmlBuilder.append("</lista>");
+            xmlBuilder.append("</" + fieldName + ">");
         } else {
             var fieldName = "";
-            if(objectClass.isPrimitive() || isWrapper(objectClass)) {
-                fieldName = "algo";
-            }
 
              fieldName = objectClass.isAnnotationPresent(TagName.class)
                     ? objectClass.getAnnotation(TagName.class).value()
@@ -34,10 +34,6 @@ public class XmlParser {
 
             xmlBuilder.append("<" + fieldName + ">");
             for (Field atributo: objectClass.getDeclaredFields()){
-                if(atributo.getType().isAssignableFrom(List.class)) {
-                    System.out.println("");
-                }
-
                 String nome = atributo.isAnnotationPresent(TagName.class)
                         ? atributo.getAnnotation(TagName.class).value()
                         : atributo.getName();

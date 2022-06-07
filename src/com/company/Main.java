@@ -14,6 +14,11 @@ public class Main {
 
         var pessoa = new Pessoa(10, "pedro", telefones);
 
-        System.out.println(XmlParser.toXml(pessoa));
+        var tags = new ArrayList<Tag>();
+        tags.add(new Tag("t1"));
+        tags.add(new Tag("t2"));
+        var prod = new Produto(111, "prod1", tags);
+
+        System.out.println(XmlParser.toXml(prod));
     }
 }
