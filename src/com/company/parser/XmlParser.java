@@ -4,10 +4,11 @@ import com.company.annotations.TagName;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.List;
 
 public class XmlParser {
 
-    public String toXml(Object object) throws IllegalAccessException {
+    public static String toXml(Object object) throws IllegalAccessException {
         var objectClass = object.getClass();
 
         StringBuilder xmlBuilder = new StringBuilder();
@@ -22,13 +23,21 @@ public class XmlParser {
             }
             xmlBuilder.append("</lista>");
         } else {
-            String nomeClasse = objectClass.isAnnotationPresent(TagName.class)
+            var fieldName = "";
+            if(objectClass.isPrimitive() || isWrapper(objectClass)) {
+                fieldName = "algo";
+            }
+
+             fieldName = objectClass.isAnnotationPresent(TagName.class)
                     ? objectClass.getAnnotation(TagName.class).value()
                     : objectClass.getSimpleName();
 
-            xmlBuilder.append("<" + nomeClasse + ">");
+            xmlBuilder.append("<" + fieldName + ">");
             for (Field atributo: objectClass.getDeclaredFields()){
-                atributo.setAccessible(true);
+                if(atributo.getType().isAssignableFrom(List.class)) {
+                    System.out.println("");
+                }
+
                 String nome = atributo.isAnnotationPresent(TagName.class)
                         ? atributo.getAnnotation(TagName.class).value()
                         : atributo.getName();
@@ -38,9 +47,13 @@ public class XmlParser {
                 xmlBuilder.append(valor);
                 xmlBuilder.append("</" + nome + ">");
             }
-            xmlBuilder.append("</" + nomeClasse + ">");
+            xmlBuilder.append("</" + fieldName + ">");
         }
 
         return xmlBuilder.toString();
+    }
+
+    private static boolean isWrapper(Object object){
+        return object instanceof String || object instanceof Integer;
     }
 }
